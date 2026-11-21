@@ -1,0 +1,7 @@
+The Bright Star Catalogue, 5th Revised Edition (Preliminary Version)
+Hoffleit, D. and Warren, W. H. Jr. (1991), Yale University Observatory.
+Distributed by the Astronomical Data Center (NASA) and CDS Strasbourg as catalogue V/50; in the public domain.
+
+The hero sky uses the stars to magnitude 5.5 (positions J2000, visual magnitude, temperature), taken
+from the JSON conversion published at https://github.com/brettonw/YaleBrightStarCatalog and packed by
+tools/build_star_catalog.py into src/star-catalog.js.
