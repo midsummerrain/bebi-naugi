@@ -433,8 +433,14 @@ summary small { font-weight: 400; color: var(--soft); }
 /* No photo yet: the dish's pixel picture, large, on a plate tinted by kind of dish. */
 /* The live preview of the dish's video (TikTok's official player, a 9:16 still until pressed),
    centred over the card picture; it never takes the click, which opens the dish. */
-.pic iframe.live { position: absolute; left: 0; top: 50%; width: 100%; height: auto; aspect-ratio: 9 / 16; transform: translateY(-50%); border: 0; pointer-events: none; opacity: 0; transition: opacity .35s; }
-.pic iframe.live.shown { opacity: 1; }
+.pic iframe.live { position: absolute; z-index: 0; left: 0; top: 50%; width: 100%; height: auto; aspect-ratio: 9 / 16; transform: translateY(-50%); border: 0; pointer-events: none; }
+/* The card picture lies over the preview (which loads behind it, never seen half drawn) and only
+   steps aside once the player says it has drawn. */
+.pic > img, .pic > svg { position: relative; z-index: 1; transition: opacity .35s; }
+.pic-art::before { content: ''; position: absolute; inset: 0; z-index: 1; background: inherit; transition: opacity .35s; }
+.pic-art > .art-mini { position: absolute; z-index: 2; }
+.pic-art > .art { z-index: 2; }
+.pic.live-on > img, .pic.live-on > svg, .pic.live-on::before { opacity: 0; }
 .pic.live-on .pic-note { display: none; }
 .video.gone .credit-line { color: var(--soft); }
 .pic-art { display: grid; place-items: center; background: radial-gradient(circle at 50% 58%, rgba(255,255,255,.10) 0 30%, transparent 31%), var(--plate, #1a2150); }
@@ -690,6 +696,20 @@ summary small { font-weight: 400; color: var(--soft); }
   .tu-cab { grid-template-columns: minmax(0, 1fr); }
   .tu-box { min-height: 0; }
 }
+
+/* Dish sheet video: the player, small switches when there are several, one quiet credit line. */
+.vid { display: grid; gap: 8px; margin-top: 14px; }
+.vid-pick { display: flex; flex-wrap: wrap; gap: 6px; }
+.vid-tab { min-height: 32px; padding: 3px 12px; border: 2px solid var(--line); background: transparent; color: var(--soft); font: inherit; font-size: var(--fs-xs); font-weight: 600; cursor: pointer; clip-path: var(--px-small); }
+.vid-tab[aria-pressed=true] { border-color: var(--accent); color: var(--accent); }
+.vid .player { width: 100%; max-width: 320px; margin: 0; background: #0b0f24; }
+.vid .player iframe.full { z-index: 1; }
+.vid .player.loading::before { content: ''; position: absolute; inset: 0; z-index: 0; background: linear-gradient(110deg, #0b0f24 30%, #1a2150 50%, #0b0f24 70%) 0 0 / 300% 100%; }
+@media (prefers-reduced-motion: no-preference) { .vid .player.loading::before { animation: vid-wait 1.6s linear infinite; } }
+@keyframes vid-wait { to { background-position: -150% 0; } }
+.vid-fail { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding: 16px; text-align: center; color: var(--soft); font-size: var(--fs-sm); }
+.vid-cite { margin: 0; font-size: var(--fs-xs); color: var(--soft); opacity: .7; }
+.vid-cite a { color: inherit; }
 </style>
 </head>
 <body>
@@ -1657,7 +1677,7 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
       save: 'Lưu món', unsave: 'Bỏ lưu', main: 'Chính', other: 'Phụ', spice: 'Gia vị riêng', ingredients: 'Nguyên liệu',
       ingNote: 'Danh sách do bebi tự ghi lại theo cách nấu phổ biến, có thể khác video.',
       addMissing: n => `Thêm ${n} thứ còn thiếu vào danh sách đi chợ`, added: 'Đã thêm vào danh sách đi chợ', allHave: 'Bạn có đủ nguyên liệu rồi',
-      videoTitle: 'Video công thức', credit: h => `Tham khảo từ video của <b>@${esc(h)}</b> trên TikTok`, play: 'Xem video này', openTikTok: 'Mở trên TikTok', previewOf: h => `Xem trước video của @${h}`,
+      videoTitle: 'Video công thức', credit: h => `Tham khảo từ video của <b>@${esc(h)}</b> trên TikTok`, play: 'Xem video này', openTikTok: 'Mở trên TikTok', previewOf: h => `Xem trước video của @${h}`, videoN: n => `Video ${n}`, vidCite: (h, url) => `Video của @${esc(h)}, <a href="${url}" target="_blank" rel="noopener noreferrer">mở trên TikTok</a>`, vidFail: 'Video chưa tải được ở đây.',
       videoGone: 'Video này không còn xem được trên TikTok, có thể người đăng đã gỡ hoặc để riêng tư.', allGone: 'Các video bebi gắn cho món này không còn xem được trên TikTok.',
       profile: h => `Trang của @${h}`, takedown: 'Bạn là tác giả? Yêu cầu gỡ hoặc sửa', searchMore: 'Tìm thêm video món này trên TikTok',
       noVideoYet: 'bebi chưa gắn video cho món này.', close: 'Đóng',
@@ -1706,7 +1726,7 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
       save: 'Save dish', unsave: 'Unsave', main: 'Main', other: 'Also', spice: 'Special seasoning', ingredients: 'Ingredients',
       ingNote: 'bebi\'s own list for the usual way to cook it; the video may differ.',
       addMissing: n => `Add ${n} missing ${n === 1 ? 'item' : 'items'} to the shopping list`, added: 'Added to the shopping list', allHave: 'You have everything',
-      videoTitle: 'Recipe videos', credit: h => `From a video by <b>@${esc(h)}</b> on TikTok`, play: 'Watch this video', openTikTok: 'Open on TikTok', previewOf: h => `Preview of the video by @${h}`,
+      videoTitle: 'Recipe videos', credit: h => `From a video by <b>@${esc(h)}</b> on TikTok`, play: 'Watch this video', openTikTok: 'Open on TikTok', previewOf: h => `Preview of the video by @${h}`, videoN: n => `Video ${n}`, vidCite: (h, url) => `Video by @${esc(h)}, <a href="${url}" target="_blank" rel="noopener noreferrer">open on TikTok</a>`, vidFail: 'The video did not load here.',
       videoGone: 'This video can no longer be played on TikTok; the creator may have removed it or made it private.', allGone: 'The videos bebi linked for this dish can no longer be played on TikTok.',
       profile: h => `@${h}'s page`, takedown: 'Are you the creator? Ask for removal or a fix', searchMore: 'Search TikTok for more videos of this dish',
       noVideoYet: 'bebi has no video for this dish yet.', close: 'Close',
@@ -1849,7 +1869,7 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
   // player says so (onPlayerError, INVALID_VIDEO): the video is then skipped on this device for a
   // week and the dish's next video, or its picture, is shown instead.
   const PLAYER_PREVIEW = 'controls=0&progress_bar=0&play_button=0&volume_control=0&fullscreen_button=0&timestamp=0&loop=0&autoplay=0&music_info=0&description=0&rel=0&native_context_menu=0&closed_caption=0';
-  const PLAYER_FULL = 'description=1&music_info=1&rel=0&autoplay=0';
+  const PLAYER_FULL = '';
   const DEAD = (() => {
     try {
       const all = JSON.parse(localStorage.getItem('nau-dead') || '{}'), now = Date.now();
@@ -1857,51 +1877,79 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
     } catch { return new Map(); }
   })();
   const liveVideos = d => d.videos.filter(v => !DEAD.has(v.id));
-  const playerFrame = (id, query, cls, title) => `<iframe class="${cls}" data-vid="${esc(id)}" src="https://www.tiktok.com/player/v1/${encodeURIComponent(id)}?${query}" allow="fullscreen; encrypted-media" allowfullscreen title="${esc(title)}" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+  const playerFrame = (id, query, cls, title) => `<iframe class="${cls}" data-vid="${esc(id)}" src="https://www.tiktok.com/${cls === 'full' ? 'embed/v2' : 'player/v1'}/${encodeURIComponent(id)}${query ? '?' + query : ''}" allow="fullscreen; encrypted-media" allowfullscreen title="${esc(title)}" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   function videoGone(frame, keep) {
     const id = frame.dataset.vid;
     if (!DEAD.has(id)) {
       DEAD.set(id, keep ? Date.now() : 0);
       if (keep) try { localStorage.setItem('nau-dead', JSON.stringify(Object.fromEntries([...DEAD].filter(([, at]) => at)))); } catch { /* private mode */ }
     }
+    clearTimeout(frame.waitTimer);
     if (frame.classList.contains('live')) {
       const pic = frame.closest('.pic');
       frame.remove();
       if (pic) { pic.classList.remove('live-on'); fillLive(pic); }
+      pumpLive();
       return;
     }
-    const li = frame.closest('.video');
-    if (!li) return;
-    li.classList.add('gone');
-    li.querySelector('.player').outerHTML = `<p class="note">${esc(t('videoGone'))}</p>`;
-    li.querySelector('[data-play]')?.remove();
-    const next = $('.video:not(.gone) [data-play]', dishBody);
-    if (next && !$('.player iframe', dishBody)) play(next);
+    const box = frame.closest('.vid');
+    if (box) showVideo(box);
+  }
+  // The player says it has drawn itself (a size message, which a removed video never sends): only
+  // then is it shown, so neither a card nor the sheet ever shows the player's blank white page.
+  function frameReady(frame) {
+    clearTimeout(frame.waitTimer);
+    if (frame.classList.contains('live')) {
+      delete frame.dataset.busy;
+      liveHits++;
+      setTimeout(() => {
+        if (!frame.isConnected) return;
+        frame.classList.add('shown');
+        frame.closest('.pic')?.classList.add('live-on');
+      }, 350);
+      pumpLive();
+    } else {
+      frame.closest('.player')?.classList.remove('loading');
+      frame.classList.add('shown');
+    }
   }
   window.addEventListener('message', e => {
     if (e.origin !== 'https://www.tiktok.com') return;
     let m = e.data;
     if (typeof m === 'string') { try { m = JSON.parse(m); } catch { return; } }
-    if (!m || !m['x-tiktok-player'] || !/^on(Player)?Error$/.test(m.type)) return;
+    if (!m || typeof m !== 'object') return;
     const frame = [...document.querySelectorAll('iframe[data-vid]')].find(f => f.contentWindow === e.source);
     if (!frame) return;
+    if ('signalSource' in m || m.type === 'onPlayerReady') { frameReady(frame); return; }
+    if (!m['x-tiktok-player'] || !/^on(Player)?Error$/.test(m.type)) return;
     // The player sends onError and then onPlayerError with the reason; act on the reason, or on the
     // bare error if no reason follows.
     if (m.type === 'onPlayerError') { clearTimeout(frame.errTimer); videoGone(frame, m.value?.errorType === 'INVALID_VIDEO'); }
     else frame.errTimer = setTimeout(() => frame.isConnected && videoGone(frame, false), 1500);
   });
-  // A card's preview loads when the card comes near the screen (not with Data Saver on) and fades in
-  // only once the player has loaded without an error, so a removed video never flashes its error.
+  // A card's preview loads when the card comes near the screen (not with Data Saver on), four at a
+  // time, and shows only once drawn; one that has not drawn itself in 15 seconds is dropped and the
+  // card keeps its picture.
+  const LIVE_AT_ONCE = 4, liveQueue = [];
+  let liveMisses = 0, liveHits = 0, liveOff = (() => { try { return sessionStorage.getItem('nau-live-off') === '1'; } catch { return false; } })();
   const liveWatch = 'IntersectionObserver' in window && !navigator.connection?.saveData
     ? new IntersectionObserver(entries => entries.forEach(en => { if (en.isIntersecting) { liveWatch.unobserve(en.target); fillLive(en.target); } }), {rootMargin: '200px 0px'})
     : null;
-  function fillLive(pic) {
-    const d = DISH_BY_ID.get(pic.dataset.live), v = d && liveVideos(d)[0];
-    if (!v || !pic.isConnected) return;
-    pic.insertAdjacentHTML('beforeend', playerFrame(v.id, PLAYER_PREVIEW, 'live', t('previewOf')(v.who)));
-    const frame = pic.lastElementChild;
-    frame.tabIndex = -1;
-    frame.addEventListener('load', () => setTimeout(() => { if (frame.isConnected) { frame.classList.add('shown'); pic.classList.add('live-on'); } }, 900), {once: true});
+  function fillLive(pic) { if (!liveOff) { liveQueue.push(pic); pumpLive(); } }
+  function pumpLive() {
+    while (liveQueue.length && document.querySelectorAll('iframe.live[data-busy]').length < LIVE_AT_ONCE) {
+      const pic = liveQueue.shift(), d = DISH_BY_ID.get(pic.dataset.live), v = d && liveVideos(d)[0];
+      if (!v || !pic.isConnected || pic.dataset.liveFailed) continue;
+      pic.insertAdjacentHTML('beforeend', playerFrame(v.id, PLAYER_PREVIEW, 'live', t('previewOf')(v.who)));
+      const frame = pic.lastElementChild;
+      frame.tabIndex = -1;
+      frame.dataset.busy = '1';
+      frame.waitTimer = setTimeout(() => {
+        pic.dataset.liveFailed = '1'; frame.remove();
+        if (++liveMisses >= LIVE_AT_ONCE && !liveHits) { liveOff = true; liveQueue.length = 0; document.querySelectorAll('iframe.live:not(.shown)').forEach(f => f.remove()); try { sessionStorage.setItem('nau-live-off', '1'); } catch { /* */ } }
+        pumpLive();
+      }, 10000);
+    }
   }
   if (liveWatch) {
     const watch = () => document.querySelectorAll('.pic[data-live]:not([data-watched])').forEach(p => { p.dataset.watched = '1'; liveWatch.observe(p); });
@@ -2162,23 +2210,21 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
     const tags = list => list.map(j => `<span class="tag ${have.all.has(j) ? 'have' : 'miss'}">${esc(ingName(j))}</span>`).join('');
     const rows = [['main', d.main], ['other', d.other], ['spice', d.spice], ['base', d.base]].filter(([, l]) => l.length)
       .map(([k, l]) => `<li><span class="kind">${esc(t(k))}</span>${tags(l)}</li>`).join('');
+    // The video, nothing around it but small "Video 1, 2, 3" switches when there are several and one
+    // quiet credit line at the end (owner: viewers need no more; takedown requests are in the footer).
     const alive = liveVideos(d);
-    const videos = alive.map(v => `<li class="video" data-vli="${v.id}">
-        <p class="credit-line">${t('credit')(v.who)}</p>
-        <button type="button" class="btn btn-small" data-play="${v.id}" data-who="${esc(v.who)}">${pxIcon('play')}${esc(t('play'))}</button>
-        <div class="player" hidden></div>
-        <div class="video-links"><a href="${videoUrl(v)}" target="_blank" rel="noopener noreferrer">${esc(t('openTikTok'))}</a><a href="https://www.tiktok.com/@${encodeURIComponent(v.who)}" target="_blank" rel="noopener noreferrer">${esc(t('profile')(v.who))}</a><a href="${takedownUrl(d, v)}" target="_blank" rel="noopener noreferrer">${esc(t('takedown'))}</a></div>
-      </li>`).join('');
-    const tiktokSearch = `https://www.tiktok.com/search?q=${encodeURIComponent(d.vi + ' cách làm')}`;
+    const videos = alive.length ? `<div class="vid" data-vdish="${d.id}" data-at="0">
+        ${alive.length > 1 ? `<div class="vid-pick" role="group">${alive.map((v, n) => `<button type="button" class="vid-tab" data-vid-pick="${n}" aria-pressed="${n === 0}">${esc(t('videoN')(n + 1))}</button>`).join('')}</div>` : ''}
+        <div class="player loading"></div>
+        <p class="vid-cite"></p>
+      </div>` : '';
     // The photo alone (owner: credits belong under "Thông tin"): every photo's creator, license and
     // file page are listed on the sources page, linked from the footer.
     let photo = '';
     if (d.photo) photo = `<figure class="sheet-photo"><img src="assets/dishes/${d.photo.file}.webp" alt="" width="360" height="240"></figure>`;
     // With a video that still plays, its preview comes first (beside the facts on wide screens) and
     // stands in for the photo; without one, the photo leads and the video section says so.
-    const videoBlock = `<h3>${esc(t('videoTitle'))}</h3>
-      ${videos ? `<ul class="videos">${videos}</ul>` : `<p class="note">${esc(t(d.videos.length ? 'allGone' : 'noVideoYet'))}</p>`}
-      <p class="video-links"><a href="${tiktokSearch}" target="_blank" rel="noopener noreferrer">${esc(t('searchMore'))}</a>${d.videos.length ? '' : ` <a href="${takedownUrl(d)}" target="_blank" rel="noopener noreferrer">${esc(t('takedown'))}</a>`}</p>`;
+    const videoBlock = videos || (d.videos.length ? `<p class="vid-cite">${esc(t('allGone'))}</p>` : '');
     dishBody.innerHTML = `${videos ? '' : photo}
       <div class="sheet-head">${icon(d.role in ROLES ? d.role : 'man')}<h2 id="dishTitle">${esc(dishName(d))}</h2>
         <button type="button" class="close" data-close aria-label="${esc(t('close'))}">${pxIcon('close')}</button>
@@ -2200,18 +2246,30 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
     $('.close', dishBody).focus();
     // See the video before deciding: the first one loads straight away as a still preview (the
     // official player, which plays only when pressed).
-    const first = $('[data-play]', dishBody);
-    if (first) play(first);
+    const box = $('.vid', dishBody);
+    if (box) showVideo(box, 0);
   }
-  // The official TikTok player, one at a time: it shows the creator's cover as a preview and plays
-  // only when pressed.
-  function play(btn) {
-    $$('.player', dishBody).forEach(p => { p.innerHTML = ''; p.hidden = true; });
-    $$('[data-play]', dishBody).forEach(b => { b.hidden = false; });
-    const box = btn.nextElementSibling;
-    box.hidden = false;
-    box.innerHTML = playerFrame(btn.dataset.play, PLAYER_FULL, 'full', t('credit')(btn.dataset.who).replace(/<[^>]+>/g, ''));
-    btn.hidden = true;
+  // The official TikTok player for one of the dish's videos (n; without n, the next one that still
+  // plays). While it loads the box shows a quiet placeholder; a removed video passes to the next.
+  function showVideo(box, n) {
+    const d = DISH_BY_ID.get(box.dataset.vdish), alive = liveVideos(d);
+    if (n === undefined) {
+      n = Math.min(+box.dataset.at || 0, alive.length - 1);
+      const pick = $('.vid-pick', box);
+      if (pick && alive.length > 1) pick.innerHTML = alive.map((v, k) => `<button type="button" class="vid-tab" data-vid-pick="${k}" aria-pressed="false">${esc(t('videoN')(k + 1))}</button>`).join('');
+      else if (pick) pick.remove();
+    }
+    const v = alive[n];
+    if (!v) { box.outerHTML = `<p class="vid-cite">${esc(t('allGone'))}</p>`; return; }
+    box.dataset.at = n;
+    $$('.vid-tab', box).forEach((tb, k) => tb.setAttribute('aria-pressed', String(k === n)));
+    const player = $('.player', box);
+    player.classList.add('loading');
+    player.innerHTML = playerFrame(v.id, PLAYER_FULL, 'full', t('previewOf')(v.who));
+    const frame = player.firstElementChild;
+    // The standard embed is see-through until it draws, so the placeholder shows until then.
+    frame.addEventListener('load', () => setTimeout(() => player.classList.remove('loading'), 4000), {once: true});
+    $('.vid-cite', box).innerHTML = t('vidCite')(v.who, videoUrl(v));
   }
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   dishDialog.addEventListener('close', () => { $$('.player', dishBody).forEach(p => { p.innerHTML = ''; }); if (openedFrom && openedFrom.focus) openedFrom.focus(); });
@@ -2425,7 +2483,7 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
       renderResults(); if (state.mamOpen) renderMam();
       return;
     }
-    if (ds.play) { play(el); return; }
+    if (ds.vidPick !== undefined) { showVideo(el.closest('.vid'), +ds.vidPick); return; }
     if (ds.shop) { addMissing(ds.shop); el.disabled = true; el.lastChild.textContent = t('added'); return; }
     if ('close' in ds) { el.closest('dialog').close(); return; }
     if ('back' in ds) { state.view = 'results'; renderResults(); renderCounts(); return; }
