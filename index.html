@@ -478,7 +478,8 @@ summary small { font-weight: 400; color: var(--soft); }
 .sheet-photo img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; max-height: 340px; }
 .sheet-photo figcaption { padding: 6px clamp(16px, 3vw, 30px) 0; font-size: var(--fs-xs); color: var(--soft); }
 .sheet-photo a { color: var(--lavender); }
-.more { margin-top: 12px; }
+.more { margin-top: 0; }
+.more-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .empty { padding: 22px; background: var(--night-glass); border: 2px dashed var(--line); color: var(--soft); }
 .empty h2 { font-size: var(--fs-h3); color: var(--ink); margin-bottom: 6px; }
 
@@ -1066,6 +1067,8 @@ summary small { font-weight: 400; color: var(--soft); }
         <div class="filter-row" id="timeFilter" role="group" aria-label="Thời gian"></div>
         <div class="filter-row" id="cuisineFilter" role="group" aria-label="Ẩm thực"></div>
         <div class="filter-row" id="roleFilter" role="group" aria-label="Loại món"></div>
+        <div class="filter-row" id="levelFilter" role="group" aria-label="Độ khó"></div>
+        <div class="filter-row" id="sortFilter" role="group" aria-label="Sắp xếp"></div>
         <div class="filter-row" id="moreFilter" role="group" aria-label="Khác"></div>
       </details>
     </section>
@@ -1658,7 +1661,7 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
       time: 'Thời gian', anyTime: 'Bất kỳ', upTo: n => `Dưới ${n} phút`, cuisine: 'Ẩm thực', role: 'Loại món', more: 'Thêm',
       chay: 'Món chay', cheap: 'Rẻ', easy: 'Dễ làm', withVideo: 'Có video',
       ready: 'Nấu được ngay', readyNote: 'Đủ hết nguyên liệu, tính cả tủ bếp bạn đã chọn.', near: 'Thiếu 1–2 món', nearNote: 'Mua thêm một hai thứ là nấu được.',
-      fresh: 'Gợi ý món mới', freshNote: 'Dùng được thứ bạn có, cần thêm vài nguyên liệu.', showMore: n => `Xem thêm ${n} món`,
+      fresh: 'Gợi ý món mới', freshNote: 'Dùng được thứ bạn có, cần thêm vài nguyên liệu.', showMore: n => `Xem thêm ${n} món`, showAll: n => `Xem tất cả (${n})`, levelLabel: 'Độ khó', sortLabel: 'Sắp xếp', sorts: {'': 'Hợp nhất', easy: 'Dễ trước', hard: 'Khó trước', quick: 'Nhanh trước'},
       withRice: 'Có cơm', noRice: 'Không cơm', riceLabel: 'Món ăn với cơm hay món không cơm', tiersLabel: 'Mức gợi ý',
       missingN: n => `thiếu ${n} thứ`, noVideoShort: 'Chưa có video', otherSide: n => `Bên này chưa có món nào. Bên còn lại có ${n} món.`,
       photoCredit: 'Ảnh minh họa', filtersBtn: 'Bộ lọc', activeN: n => `${n} đang bật`,
@@ -1672,7 +1675,7 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
       mShopIng: 'Thêm vào danh sách đi chợ', mNoEat: 'Không ăn được thứ này (ẩn món có nó)', mEat: 'Ăn lại được thứ này',
       tFav: n => `Đã thêm ${n} vào Yêu thích`, tUnfav: n => `Đã bỏ ${n} khỏi Yêu thích`, tKeep: n => `Đã để dành ${n}`, tHide: n => `Đã ẩn ${n}`,
       tNoEat: n => `Sẽ không gợi ý món có ${n}`, tCopied: 'Đã chép link món', tMam: n => `Đã đưa ${n} vào mâm`, tShop: 'Đã thêm vào danh sách đi chợ', undo: 'Hoàn tác',
-      minutes: n => n >= 120 ? `${Math.round(n / 60)} giờ` : `${n} phút`, level: ['', 'Dễ', 'Vừa', 'Khó'], cost: ['', 'Rẻ', 'Vừa túi', 'Sang'],
+      minutes: n => n >= 120 ? `${Math.round(n / 60)} giờ` : `${n} phút`, level: ['', 'Dễ', 'Trung bình', 'Khó'], cost: ['', 'Rẻ', 'Vừa túi', 'Sang'],
       match: n => `Khớp ${n}%`, missing: 'Thiếu', videoBy: h => `Video của @${h}`, videos: n => `${n} video`, noVideo: 'Chưa có video, tìm trên TikTok',
       save: 'Lưu món', unsave: 'Bỏ lưu', main: 'Chính', other: 'Phụ', spice: 'Gia vị riêng', ingredients: 'Nguyên liệu',
       ingNote: 'Danh sách do bebi tự ghi lại theo cách nấu phổ biến, có thể khác video.',
@@ -1707,7 +1710,7 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
       time: 'Time', anyTime: 'Any', upTo: n => `Under ${n} min`, cuisine: 'Cuisine', role: 'Kind', more: 'More',
       chay: 'Vegetarian', cheap: 'Cheap', easy: 'Easy', withVideo: 'Has video',
       ready: 'Cook now', readyNote: 'You have everything, counting the pantry you chose.', near: 'Missing 1–2 things', nearNote: 'Buy one or two things and you are set.',
-      fresh: 'New ideas', freshNote: 'Uses what you have, needs a few more things.', showMore: n => `Show ${n} more`,
+      fresh: 'New ideas', freshNote: 'Uses what you have, needs a few more things.', showMore: n => `Show ${n} more`, showAll: n => `Show all (${n})`, levelLabel: 'Difficulty', sortLabel: 'Sort', sorts: {'': 'Best match', easy: 'Easiest first', hard: 'Hardest first', quick: 'Quickest first'},
       withRice: 'With rice', noRice: 'No rice', riceLabel: 'Dishes eaten with rice or without', tiersLabel: 'Suggestion lists',
       missingN: n => `${n} missing`, noVideoShort: 'No video yet', otherSide: n => `Nothing on this side yet. The other side has ${n} dishes.`,
       photoCredit: 'Representative photo', filtersBtn: 'Filters', activeN: n => `${n} on`,
@@ -1765,7 +1768,7 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
     noEat: new Set(idsToIdx(saved0.noEat)),
     mamFix: Object.fromEntries(Object.entries(saved0.mamFix || {}).filter(([, id]) => DISH_BY_ID.has(id))),
     shop: new Map(Object.entries(saved0.shop || {}).filter(([id]) => ING_BY_ID.has(id))),
-    time: 0, cuisines: new Set(), roles: new Set(), chay: false, cheap: false, easy: false, withVideo: false,
+    time: 0, cuisines: new Set(), roles: new Set(), levels: new Set(), sort: '', chay: false, cheap: false, easy: false, withVideo: false,
     view: 'results', shown: 12, group: 'thit', mamSeed: 0, mamOpen: false, lastPick: null,
     // "Có cơm" (eaten with rice, or a rice plate) or "Không cơm" (noodles, bánh, hotpot, snacks...),
     // and which of the three suggestion lists is open.
@@ -1809,7 +1812,7 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
     if (state.roles.size && !state.roles.has(d.role)) return false;
     if (state.chay && !d.chay) return false;
     if (state.cheap && d.cost > 1) return false;
-    if (state.easy && d.level > 1) return false;
+    if (state.levels.size && !state.levels.has(d.level || 1)) return false;
     if (state.withVideo && !liveVideos(d).length) return false;
     if (state.hidden.has(d.id)) return false;
     if (state.noEat.size && [...d.main, ...d.other, ...d.spice].some(j => state.noEat.has(j) || (ING[j].parent >= 0 && state.noEat.has(ING[j].parent)))) return false;
@@ -1843,6 +1846,7 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
       else other[key]++;
     }
     ready.sort(order); near.sort(order); fresh.sort(order);
+    [ready, near, fresh].forEach(sortBy);
     return {ready, near, fresh, have, other};
   }
   function passesExceptRice(d) {
@@ -1857,8 +1861,16 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
   const hashMix = (n, seed) => { let x = (n + 1) * 2654435761 ^ seed * 40503; x = Math.imul(x ^ x >>> 15, 2246822507); return (x ^ x >>> 13) >>> 0; };
   function popular() {
     const have = haveSet();
-    return DISH.filter(d => d.pop >= 3 && passes(d)).map(d => score(d, have))
-      .sort((a, b) => (b.d.videos.length > 0) - (a.d.videos.length > 0) || hashMix(a.d.i, daySeed) - hashMix(b.d.i, daySeed));
+    return sortBy(DISH.filter(d => d.pop >= 3 && passes(d)).map(d => score(d, have))
+      .sort((a, b) => (b.d.videos.length > 0) - (a.d.videos.length > 0) || hashMix(a.d.i, daySeed) - hashMix(b.d.i, daySeed)));
+  }
+  // The chosen sort (Dễ trước, Khó trước, Nhanh trước) on top of the usual order, which breaks ties.
+  function sortBy(list) {
+    const k = state.sort;
+    if (k === 'easy') list.sort((a, b) => (a.d.level || 1) - (b.d.level || 1));
+    else if (k === 'hard') list.sort((a, b) => (b.d.level || 1) - (a.d.level || 1));
+    else if (k === 'quick') list.sort((a, b) => a.d.time - b.d.time);
+    return list;
   }
 
   // ------------------------------------------------------------------ video previews
@@ -2008,8 +2020,8 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
   const PAGE = 12;
   function grid(list) {
     const shown = list.slice(0, state.shown), rest = list.length - shown.length;
-    return `<ul class="grid">${shown.map(card).join('')}</ul>
-      ${rest > 0 ? `<button type="button" class="btn btn-small more" data-more>${esc(t('showMore')(Math.min(rest, PAGE)))}</button>` : ''}`;
+    const more = rest <= 0 ? '' : `<div class="more-row">${[20, 50].filter(n => n < rest).map(n => `<button type="button" class="btn btn-small more" data-more="${n}">${esc(t('showMore')(n))}</button>`).join('')}<button type="button" class="btn btn-small more" data-more="all">${esc(rest <= 20 ? t('showMore')(rest) : t('showAll')(rest))}</button></div>`;
+    return `<ul class="grid">${shown.map(card).join('')}</ul>${more}`;
   }
   // The rice switch: two big halves with their counts, so nobody misses the other side.
   function riceSwitch(com, khong) {
@@ -2092,9 +2104,13 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
     // Only the kinds of dish on the current side of the rice switch.
     const sideRoles = Object.entries(ROLES).filter(([k]) => state.rice === 'com' ? RICE_ROLES.has(k) || k === 'mot-mon' : !RICE_ROLES.has(k));
     $('#roleFilter').innerHTML = `<span class="label">${esc(t('role'))}</span>` + sideRoles.map(([k, v]) => seg('role', k, v[lang === 'vi' ? 0 : 1], state.roles.has(k))).join('');
-    const active = (state.time ? 1 : 0) + state.cuisines.size + state.roles.size + ['chay', 'cheap', 'easy', 'withVideo'].filter(k => state[k]).length;
+    $('#levelFilter').innerHTML = `<span class="label">${esc(t('levelLabel'))}</span>` + [1, 2, 3].map(n => seg('level', n, t('level')[n], state.levels.has(n))).join('');
+    $('#sortFilter').innerHTML = `<span class="label">${esc(t('sortLabel'))}</span>` + Object.entries(t('sorts')).map(([k, v]) => seg('sort', k, v, state.sort === k)).join('');
+    $('#levelFilter').setAttribute('aria-label', t('levelLabel'));
+    $('#sortFilter').setAttribute('aria-label', t('sortLabel'));
+    const active = (state.time ? 1 : 0) + state.cuisines.size + state.roles.size + state.levels.size + (state.sort ? 1 : 0) + ['chay', 'cheap', 'withVideo'].filter(k => state[k]).length;
     $('#filterCount').textContent = active ? `(${t('activeN')(active)})` : '';
-    $('#moreFilter').innerHTML = `<span class="label">${esc(t('more'))}</span>` + ['chay', 'cheap', 'easy', 'withVideo'].map(k => seg('flag', k, t(k), state[k])).join('');
+    $('#moreFilter').innerHTML = `<span class="label">${esc(t('more'))}</span>` + ['chay', 'cheap', 'withVideo'].map(k => seg('flag', k, t(k), state[k])).join('');
     $('#timeFilter').setAttribute('aria-label', t('time'));
     $('#cuisineFilter').setAttribute('aria-label', t('cuisine'));
     $('#roleFilter').setAttribute('aria-label', t('role'));
@@ -2476,7 +2492,9 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
     if (ds.cuisine) { state.cuisines.has(ds.cuisine) ? state.cuisines.delete(ds.cuisine) : state.cuisines.add(ds.cuisine); renderFilters(); renderResults(); if (state.mamOpen) renderMam(); return; }
     if (ds.role) { state.roles.has(ds.role) ? state.roles.delete(ds.role) : state.roles.add(ds.role); renderFilters(); renderResults(); if (state.mamOpen) renderMam(); return; }
     if (ds.flag) { state[ds.flag] = !state[ds.flag]; renderFilters(); renderResults(); if (state.mamOpen) renderMam(); return; }
-    if ('more' in ds) { state.shown += PAGE; renderResults(); return; }
+    if ('more' in ds) { state.shown += ds.more === 'all' ? 1e6 : (+ds.more || PAGE); renderResults(); return; }
+    if (ds.level) { const n = +ds.level; state.levels.has(n) ? state.levels.delete(n) : state.levels.add(n); state.shown = PAGE; renderFilters(); renderResults(); if (state.mamOpen) renderMam(); return; }
+    if (ds.sort !== undefined) { state.sort = ds.sort; state.shown = PAGE; renderFilters(); renderResults(); return; }
     if (ds.rice) {
       state.rice = ds.rice; state.shown = PAGE; state.tabPicked = false;
       state.roles = new Set([...state.roles].filter(k => ds.rice === 'com' ? RICE_ROLES.has(k) || k === 'mot-mon' : !RICE_ROLES.has(k)));
