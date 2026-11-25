@@ -905,12 +905,12 @@ summary small { font-weight: 400; color: var(--soft); }
 .role-mot-mon { --plate: #3a2f1a; } .role-lau { --plate: #3c2020; } .role-an-vat { --plate: #3a2a17; } .role-banh { --plate: #36281f; }
 .role-chao { --plate: #2a2f40; } .role-trang-mieng { --plate: #33223f; }
 .card-body { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px 12px; flex: 1; }
-.card h3 { font: 700 1.25rem/1.22 var(--display-font); letter-spacing: -.02em; }
+.card h3 { font: 700 1.375rem/1.22 var(--display-font); letter-spacing: -.02em; }
 .card h3 button { all: unset; cursor: pointer; }
 .card h3 button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .card-meta {
-  --card-meta-size: .875rem;
-  --card-meta-icon-size: 22px;
+  --card-meta-size: .8125rem;
+  --card-meta-icon-size: 20px;
   --badge-edge: #b0bbd8;
   display: flex;
   flex-wrap: wrap;
@@ -932,8 +932,8 @@ summary small { font-weight: 400; color: var(--soft); }
   gap: 4px;
   min-width: 0;
   max-width: 100%;
-  min-height: 30px;
-  padding: 3px 6px;
+  min-height: 27px;
+  padding: 2px 5px;
   background: transparent;
   color: var(--badge-ink, #e4e7f7);
   font-size: var(--card-meta-size);
@@ -1033,9 +1033,9 @@ summary small { font-weight: 400; color: var(--soft); }
 @keyframes card-emoji-hop { 30% { transform: translateY(-2px); } 55% { transform: translateY(1px); } }
 @keyframes card-emoji-spark { 30% { opacity: 1; } 55% { opacity: .55; } }
 @media (max-width: 370px) {
-  .card-meta { --card-meta-size: .8125rem; --card-meta-icon-size: 19px; }
+  .card-meta { --card-meta-size: .75rem; --card-meta-icon-size: 18px; }
   .card-meta, .card-meta-cook .card-meta-value { gap: 4px; }
-  .card-meta-badge { gap: 3px; min-height: 27px; padding-inline: 5px; }
+  .card-meta-badge { gap: 3px; min-height: 25px; }
 }
 @media (forced-colors: active) {
   .card-meta-badge { outline: 1px solid CanvasText; outline-offset: -1px; }
@@ -1151,11 +1151,10 @@ summary small { font-weight: 400; color: var(--soft); }
   /* Two small cards across on a phone instead of one tall one. */
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .card-body { padding: 8px 9px 10px; gap: 3px; }
-  .card h3 { overflow-wrap: anywhere; }
+  .card h3 { font-size: 1.25rem; overflow-wrap: anywhere; }
   .card .meta-line { gap: 2px 8px; }
   .opts { width: 36px; height: 36px; top: 6px; right: 6px; }
   .marks { top: 6px; left: 6px; }
-  .card h3 { font-size: 1.125rem; }
   .tier-tab { padding: 6px 10px; font-size: var(--fs-sm); }
   .brand span { display: none; }
   .footer-brand span { display: inline; }
