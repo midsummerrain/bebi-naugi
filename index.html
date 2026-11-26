@@ -3422,7 +3422,7 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
       rcAction: 'Bước thực hiện', rcDuration: 'Thời lượng', rcEstimate: 'Khoảng', rcOvernight: 'Qua đêm',
       rcPerSide: 'mỗi mặt', rcPerBatch: 'mỗi mẻ', rcAtLeast: 'Ít nhất', rcUpTo: 'Tối đa', rcOr: 'hoặc',
       rcProgress: (done, all) => `${done}/${all} bước`, rcTickHint: 'Bấm vào bước đã làm để đánh dấu.', rcTip: 'Mẹo khi nấu', rcTipSource: 'Nguồn',
-      rcLoading: 'Đang tải công thức…', rcUnavailable: 'Chưa tải được công thức.', rcHave: 'Có sẵn', rcMiss: 'Cần mua',
+      rcLoading: 'Đang tải công thức…', rcUnavailable: 'Chưa tải được công thức.', rcHave: 'Có sẵn', rcMiss: 'Cần mua', rcSwap: name => `Có ${name} để thay`,
       rcNote: 'Công thức do bebi biên soạn, có thể khác video.', rcPantry: 'Đối chiếu với tủ bếp',
       videoGone: 'Video này không còn xem được trên TikTok, có thể người đăng đã gỡ hoặc để riêng tư.', allGone: 'Các video bebi gắn cho món này không còn xem được trên TikTok.',
       profile: h => `Trang của @${h}`, takedown: 'Bạn là tác giả? Yêu cầu gỡ hoặc sửa', searchMore: 'Tìm thêm video món này trên TikTok',
@@ -3495,7 +3495,7 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
       rcAction: 'Step', rcDuration: 'Time', rcEstimate: 'About', rcOvernight: 'Overnight',
       rcPerSide: 'per side', rcPerBatch: 'per batch', rcAtLeast: 'At least', rcUpTo: 'Up to', rcOr: 'or',
       rcProgress: (done, all) => `${done}/${all} steps`, rcTickHint: 'Tap each step as you finish it.', rcTip: 'Cooking tips', rcTipSource: 'Source',
-      rcLoading: 'Loading recipe…', rcUnavailable: 'The recipe could not load.', rcHave: 'At home', rcMiss: 'To buy',
+      rcLoading: 'Loading recipe…', rcUnavailable: 'The recipe could not load.', rcHave: 'At home', rcMiss: 'To buy', rcSwap: name => `Can use ${name} instead`,
       rcNote: 'bebi wrote this recipe. It may differ from the video.', rcPantry: 'Compare with your kitchen',
       videoGone: 'This video can no longer be played on TikTok; the creator may have removed it or made it private.', allGone: 'The videos bebi linked for this dish can no longer be played on TikTok.',
       profile: h => `@${h}'s page`, takedown: 'Are you the creator? Ask for removal or a fix', searchMore: 'Search TikTok for more videos of this dish',
@@ -3587,11 +3587,17 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
   allowSubstitute('thit-xong-khoi', 'ba-chi-muoi-pancetta',
     'Pancetta có vị mặn và ít mùi khói hơn. Áp chảo cho mỡ trong rồi mới nêm thêm.',
     'Pancetta is salty and generally less smoky. Render the fat and taste before adding salt.');
+  allowSubstitute('ba-chi-muoi-pancetta', 'thit-xong-khoi',
+    'Dùng bacon lát dày, cắt theo cỡ trong công thức. Bacon xông khói sẽ làm món thơm mùi khói hơn.',
+    'Use thick-cut bacon and cut it to the size specified. Smoked bacon will give the dish a smokier flavor.');
   const interchangeable = [
     ['tom-su', 'tom-the', 'Canh độ chín theo cỡ tôm. Tôm nhỏ chín nhanh hơn.', 'Check doneness based on shrimp size. Smaller shrimp cook faster.'],
+    ['tom-su', 'tom-cang-xanh', 'Chọn tôm có cỡ gần nhau để dễ canh độ chín.', 'Choose similarly sized shrimp so they cook in about the same time.'],
     ['dui-ga', 'uc-ga', 'Cắt thịt dày đều và canh thời gian theo độ dày từng miếng.', 'Cut the pieces to an even thickness and adjust the cooking time to their size.'],
     ['nam-mo', 'nam-bao-ngu', 'Cắt miếng vừa ăn và xào đến khi nước nấm bay bớt.', 'Cut into bite-size pieces and sauté until the excess mushroom liquid evaporates.'],
+    ['nam-dui-ga', 'nam-bao-ngu', 'Tùy cỡ nấm, xé hoặc thái miếng vừa ăn rồi canh độ chín.', 'Tear or slice the mushrooms into bite-size pieces and adjust cooking time to their size.'],
     ['nam-rom', 'nam-mo', 'Cắt nấm theo kích cỡ tương đương để chín đều.', 'Cut the mushrooms to similar sizes so they cook evenly.'],
+    ['cai-ngot', 'cai-thia', 'Tách phần cọng và lá, cho cọng vào trước nếu dày.', 'Separate the stems from the leaves and cook thick stems first.'],
     ['giam-tao', 'giam-dua', 'Nêm từng ít một vì độ chua của hai loại giấm khác nhau.', 'Add the vinegar gradually because the two types differ in acidity.'],
     ['pho-mai-parmesan', 'pho-mai-grana-padano', 'Bào mịn và nếm trước khi thêm muối.', 'Grate it finely and taste the dish before adding salt.'],
     ['thit-heo-than', 'thit-than-noi-heo', 'Canh thời gian theo độ dày để phần thịt nạc giữ độ mọng.', 'Adjust the time to the thickness so the lean meat stays juicy.'],
@@ -4724,14 +4730,19 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
     const yieldText = (en ? r.ye || r.y : r.y || r.ye).trim();
     const base = recipeServingCount(r), people = base ? +box.dataset.people || base : 0;
     const ratio = base ? people / base : 1;
-    const have = haveSet(), mine = [...d.main, ...d.other, ...d.spice, ...d.base];
+    const have = haveSet(), fit = score(d, have);
+    const ingredientKeys = [...new Set([...d.main, ...d.other, ...d.spice, ...d.base])]
+      .flatMap(j => [...new Set(ING[j].keys.filter(Boolean))].map(key => ({j, key})))
+      .sort((a, b) => b.key.length - a.key.length);
     const match = name => {
       const n = ' ' + fold(name) + ' ';
-      return mine.find(j => ING[j].keys.slice(0, 2).some(k => k && n.includes(' ' + k + ' ')));
+      return ingredientKeys.find(({key}) => n.includes(' ' + key + ' '))?.j;
     };
     const row = ([amount, name]) => {
-      const j = match(name), mark = j === undefined ? '' : have.all.has(j) ? 'have' : 'miss';
-      return `<tr><th scope="row">${esc(name)}${mark ? `<span class="rc-mark ${mark}">${esc(t(mark === 'have' ? 'rcHave' : 'rcMiss'))}</span>` : ''}</th>
+      const j = match(name), swap = fit.substitutes.get(j);
+      const mark = j === undefined ? '' : have.all.has(j) || swap ? 'have' : 'miss';
+      const label = swap ? t('rcSwap')(ingName(swap.from)) : mark === 'have' ? t('rcHave') : t('rcMiss');
+      return `<tr><th scope="row">${esc(name)}${mark ? `<span class="rc-mark ${mark}">${esc(label)}</span>` : ''}</th>
         <td>${esc(amount ? scaleAmount(amount, ratio) : t('rcEnough'))}</td></tr>`;
     };
     const servingButton = (delta, label, symbol, disabled) => `<button type="button" data-rc-people="${delta}" aria-label="${esc(t(label))}"${disabled ? ' disabled' : ''}>${symbol}</button>`;
