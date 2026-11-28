@@ -4646,7 +4646,7 @@ window.NAU_ICONS = {"bot-dau-nanh":"bot-mi","dau-den":"dau-den","dau-do":"dau-do
   // bebi's own recipe for each dish (tools/build_recipes.py), in 32 small files fetched only when a
   // dish is opened. Each amount says whether it is at home (today's choice or the tủ bếp) or to buy;
   // a tapped step is ticked off.
-  const RECIPE_SHARDS = 32, RECIPE_REVISION = '119c5df62bf7', recipeFiles = new Map();
+  const RECIPE_SHARDS = 32, RECIPE_REVISION = 'e7aebc1aa6f6', recipeFiles = new Map();
   const djb2 = s => { let h = 5381; for (const ch of s) h = (Math.imul(h, 33) ^ ch.codePointAt(0)) >>> 0; return h; };
   function loadRecipe(id) {
     const n = djb2(id) % RECIPE_SHARDS;
